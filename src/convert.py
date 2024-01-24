@@ -4,9 +4,11 @@ from PySide6.QtWidgets import (
     QMainWindow,
     QLineEdit,
     QPushButton,
+    QHBoxLayout,
     QWidget,
     QLabel,
-    QVBoxLayout
+    QVBoxLayout,
+    QComboBox
 )
 
 #   TODO: layout
@@ -39,24 +41,72 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
-
-# START OF TITLE SETUP
+        # TITLE
         window_title: QLabel = QLabel(text=settings.title)
 
         title_font = window_title.font()
         title_font.setPointSize(24)
 
         window_title.setFont(title_font)
-# END OF TITLE SETUP
 
+        # CONVERSION INPUT
+        conversion_value: QLineEdit = QLineEdit()
+        conversion_value.setPlaceholderText('Conversion Value')
 
-# START OF LAYOUT SETUP
-        layout = QVBoxLayout()
-        layout.addWidget(window_title)
+        # FROM UNIT
+        from_label: QLabel = QLabel(text='From')
+        from_unit: QComboBox = QComboBox()
+        from_unit.addItems(['Celsius', 'Fahrenheit', 'Kelvin'])
+
+        # TO UNIT
+        to_label: QLabel = QLabel(text='To')
+        to_unit: QComboBox = QComboBox()
+        to_unit.addItems(['Celsius', 'Fahrenheit', 'Kelvin'])
+
+        # FROM LAYOUT
+        from_layout = QVBoxLayout()
+        from_layout.addWidget(from_label)
+        from_layout.addWidget(from_unit)
+
+        from_container = QWidget()
+        from_container.setLayout(from_layout)
+
+        # TO LAYOUT
+        to_layout = QVBoxLayout()
+        to_layout.addWidget(to_label)
+        to_layout.addWidget(to_unit)
+
+        to_container = QWidget()
+        to_container.setLayout(to_layout)
+
+        # UNITS LAYOUT
+        units_layout = QHBoxLayout()
+        units_layout.addWidget(from_container)
+        units_layout.addWidget(to_container)
+
+        units_container = QWidget()
+        units_container.setLayout(units_layout)
+
+        # CONVERT BUTTON
+        convert_button: QPushButton = QPushButton(text='Convert')
+
+        # RESULT TEXT
+        result_text: QLabel = QLabel(text='Result: ')
+
+        result_font = result_text.font()
+        result_font.setPointSize(16)
+        result_text.setFont(result_font)
+
+        # MAIN
+        main_layout = QVBoxLayout()
+        main_layout.addWidget(window_title)
+        main_layout.addWidget(conversion_value)
+        main_layout.addWidget(units_container)
+        main_layout.addWidget(convert_button)
+        main_layout.addWidget(result_text)
 
         container = QWidget()
-        container.setLayout(layout)
-# END OF LAYOUT SETUP
+        container.setLayout(main_layout)
 
         self.setCentralWidget(container)
 
