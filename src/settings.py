@@ -1,4 +1,4 @@
 title: str = 'Temperature Converter'
 
-width: int = 360
-height: int = 240
+width: int = 300
+height: int = 340

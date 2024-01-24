@@ -69,14 +69,17 @@ class MainWindow(QMainWindow):
         # CONVERT BUTTON
         self.convert_button: QPushButton = QPushButton(text='Convert')
         self.convert_button.setDisabled(True)
-        self.convert_button.clicked.connect(self.try_convert)
+        self.convert_button.clicked.connect(
+            lambda: self.try_convert(
+                self.conversion_value.text(), from_conversion)
+        )
 
         # RESULT TEXT
-        result_text: QLabel = QLabel(text='Result: ')
+        self.result_text: QLabel = QLabel(text='Result: ')
 
-        result_font = result_text.font()
+        result_font = self.result_text.font()
         result_font.setPointSize(16)
-        result_text.setFont(result_font)
+        self.result_text.setFont(result_font)
 
         # MAIN
         main_layout = QVBoxLayout()
@@ -89,7 +92,7 @@ class MainWindow(QMainWindow):
 
         main_layout.addWidget(self.convert_button)
 
-        main_layout.addWidget(result_text)
+        main_layout.addWidget(self.result_text)
 
         container = QWidget()
         container.setLayout(main_layout)
@@ -120,9 +123,33 @@ class MainWindow(QMainWindow):
             else:
                 self.to_conversion.unit.setCurrentIndex(to_index + 1)
 
-    def try_convert(self):
-        print('converting...')
-        pass
+    def try_convert(self, value: float, from_u: UnitConversionWidget, to_u: UnitConversionWidget):
+        from_value: str = from_u.unit.currentText().lower()
+        to_value: str = to_u.unit.currentText().lower()
+
+        if from_value == 'celsius':
+            if to_value == 'kelvin':
+                pass
+
+        self.result_text.setText('Result: %s' % str(from_value))
+
+    def celsius_to_fahren(value: float) -> float:
+        return (value * 9/5) + 32
+
+    def celsius_to_kelvin(value: float) -> float:
+        return value + 273.15
+
+    def fahren_to_celsius(value: float) -> float:
+        return (value - 32) * 5/9
+
+    def fahren_to_kelvin(value: float) -> float:
+        return (value - 32) * 9/5 + 273.15
+
+    def kelvin_to_celsius(value: float) -> float:
+        return value - 273.15
+
+    def kelvin_to_fahren(value: float) -> float:
+        return (value - 273.15) * 9/5 + 32
 
 
 app = QApplication([])
@@ -131,6 +158,7 @@ window = MainWindow()
 
 window.setWindowTitle(settings.title)
 window.setMinimumSize(settings.width, settings.height)
+window.setMaximumSize(settings.width, settings.height)
 
 window.show()
 
