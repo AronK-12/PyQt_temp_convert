@@ -11,35 +11,31 @@ from PySide6.QtWidgets import (
     QComboBox
 )
 
-#   TODO: layout
-#       - [X] title text
-#       - [ ] value input validation text
-#       - [ ] temperature value input
-#       - [ ] from_unit dropdow
-#       - [ ] to_unit dropdow
-#       - [ ] convert button
-#       - [ ] result text
 
-#   TODO: functionality
-#       - [ ] checking if input is numberic (float or int, either is okay)
-#       - [ ] get conversion method based on from_unit and to_unit
-#       - [ ] converting input if it's valid
-#       - [ ] update input validation text as user types temperature value
-#       - [ ] display converted value upon succesful conversion
-#       - [ ] display error message upon unsuccesful conversion
+class UnitConversionWidget(QWidget):
+    def __init__(self, name: str, units: list) -> QWidget:
+        super().__init__()
 
-#   TODO: conversion methods
-#       - [ ] Celsius to Fahrenheit
-#       - [ ] Celsius to Kelvin
-#       - [ ] Fahrenheit to Celsius
-#       - [ ] Fahrenheit to Kelvin
-#       - [ ] Kelvin to Celsius
-#       - [ ] Kelvin to Fahrenheit
+        label: QLabel = QLabel(text=name)
+        self.unit: QComboBox = QComboBox()
+        self.unit.addItems(units)
+
+        layout: QVBoxLayout = QVBoxLayout()
+        layout.addWidget(label)
+        layout.addWidget(self.unit)
+
+        self.container: QWidget = QWidget()
+        self.container.setLayout(layout)
+
+    def get_widget(self) -> QWidget:
+        return self.container
 
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+
+        self.units: list = ['celsius', 'fahrenheit', 'kelvin']
 
         # TITLE
         window_title: QLabel = QLabel(text=settings.title)
@@ -53,45 +49,27 @@ class MainWindow(QMainWindow):
         self.conversion_value: QLineEdit = QLineEdit()
         self.conversion_value.setPlaceholderText('Conversion Value')
         self.conversion_value.textChanged.connect(
-            self.validate_conversion_input)
+            self.validate_conversion_input
+        )
 
-        # FROM UNIT
-        from_label: QLabel = QLabel(text='From')
-        from_unit: QComboBox = QComboBox()
-        from_unit.addItems(['Celsius', 'Fahrenheit', 'Kelvin'])
+        self.to_conversion: UnitConversionWidget = UnitConversionWidget(
+            'To', self.units
+        )
 
-        # TO UNIT
-        to_label: QLabel = QLabel(text='To')
-        to_unit: QComboBox = QComboBox()
-        to_unit.addItems(['Celsius', 'Fahrenheit', 'Kelvin'])
+        from_conversion: UnitConversionWidget = UnitConversionWidget(
+            'From', self.units
+        )
+        from_conversion.unit.currentIndexChanged.connect(
+            lambda check: self.disable_same_conversion_units(
+                from_conversion, self.to_conversion)
+        )
 
-        # FROM LAYOUT
-        from_layout = QVBoxLayout()
-        from_layout.addWidget(from_label)
-        from_layout.addWidget(from_unit)
-
-        from_container = QWidget()
-        from_container.setLayout(from_layout)
-
-        # TO LAYOUT
-        to_layout = QVBoxLayout()
-        to_layout.addWidget(to_label)
-        to_layout.addWidget(to_unit)
-
-        to_container = QWidget()
-        to_container.setLayout(to_layout)
-
-        # UNITS LAYOUT
-        units_layout = QHBoxLayout()
-        units_layout.addWidget(from_container)
-        units_layout.addWidget(to_container)
-
-        units_container = QWidget()
-        units_container.setLayout(units_layout)
+        self.disable_same_conversion_units(from_conversion, self.to_conversion)
 
         # CONVERT BUTTON
         self.convert_button: QPushButton = QPushButton(text='Convert')
         self.convert_button.setDisabled(True)
+        self.convert_button.clicked.connect(self.try_convert)
 
         # RESULT TEXT
         result_text: QLabel = QLabel(text='Result: ')
@@ -103,9 +81,14 @@ class MainWindow(QMainWindow):
         # MAIN
         main_layout = QVBoxLayout()
         main_layout.addWidget(window_title)
+
         main_layout.addWidget(self.conversion_value)
-        main_layout.addWidget(units_container)
+
+        main_layout.addWidget(from_conversion.get_widget())
+        main_layout.addWidget(self.to_conversion.get_widget())
+
         main_layout.addWidget(self.convert_button)
+
         main_layout.addWidget(result_text)
 
         container = QWidget()
@@ -114,7 +97,7 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(container)
 
     def validate_conversion_input(self):
-        value: str = self.conversion_value.text().strip(' ').replace(' ', '')
+        value: str = self.conversion_value.text().replace(' ', '')
 
         try:
             float(value)
@@ -125,14 +108,29 @@ class MainWindow(QMainWindow):
         if value == '':
             self.convert_button.setDisabled(True)
 
+    def disable_same_conversion_units(self, from_unit: UnitConversionWidget, to_unit: UnitConversionWidget):
+        from_index: int = from_unit.unit.currentIndex()
+        to_index: int = to_unit.unit.currentIndex()
+
+        max_index: int = to_unit.unit.count()
+
+        if from_index == to_index:
+            if to_index + 1 >= max_index:
+                self.to_conversion.unit.setCurrentIndex(0)
+            else:
+                self.to_conversion.unit.setCurrentIndex(to_index + 1)
+
+    def try_convert(self):
+        print('converting...')
+        pass
+
 
 app = QApplication([])
 
 window = MainWindow()
 
 window.setWindowTitle(settings.title)
-window.setMinimumSize(settings.min_w, settings.min_h)
-window.setMaximumSize(settings.max_w, settings.max_h)
+window.setMinimumSize(settings.width, settings.height)
 
 window.show()
 
