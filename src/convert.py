@@ -50,8 +50,10 @@ class MainWindow(QMainWindow):
         window_title.setFont(title_font)
 
         # CONVERSION INPUT
-        conversion_value: QLineEdit = QLineEdit()
-        conversion_value.setPlaceholderText('Conversion Value')
+        self.conversion_value: QLineEdit = QLineEdit()
+        self.conversion_value.setPlaceholderText('Conversion Value')
+        self.conversion_value.textChanged.connect(
+            self.validate_conversion_input)
 
         # FROM UNIT
         from_label: QLabel = QLabel(text='From')
@@ -88,7 +90,8 @@ class MainWindow(QMainWindow):
         units_container.setLayout(units_layout)
 
         # CONVERT BUTTON
-        convert_button: QPushButton = QPushButton(text='Convert')
+        self.convert_button: QPushButton = QPushButton(text='Convert')
+        self.convert_button.setDisabled(True)
 
         # RESULT TEXT
         result_text: QLabel = QLabel(text='Result: ')
@@ -100,15 +103,27 @@ class MainWindow(QMainWindow):
         # MAIN
         main_layout = QVBoxLayout()
         main_layout.addWidget(window_title)
-        main_layout.addWidget(conversion_value)
+        main_layout.addWidget(self.conversion_value)
         main_layout.addWidget(units_container)
-        main_layout.addWidget(convert_button)
+        main_layout.addWidget(self.convert_button)
         main_layout.addWidget(result_text)
 
         container = QWidget()
         container.setLayout(main_layout)
 
         self.setCentralWidget(container)
+
+    def validate_conversion_input(self):
+        value: str = self.conversion_value.text().strip(' ').replace(' ', '')
+
+        try:
+            float(value)
+            self.convert_button.setDisabled(False)
+        except ValueError:
+            self.convert_button.setDisabled(True)
+
+        if value == '':
+            self.convert_button.setDisabled(True)
 
 
 app = QApplication([])
