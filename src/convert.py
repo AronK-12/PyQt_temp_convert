@@ -71,7 +71,7 @@ class MainWindow(QMainWindow):
         self.convert_button.setDisabled(True)
         self.convert_button.clicked.connect(
             lambda: self.try_convert(
-                self.conversion_value.text(), from_conversion)
+                self.conversion_value.text(), from_conversion, self.to_conversion)
         )
 
         # RESULT TEXT
@@ -127,28 +127,42 @@ class MainWindow(QMainWindow):
         from_value: str = from_u.unit.currentText().lower()
         to_value: str = to_u.unit.currentText().lower()
 
+        result: str = None
+
         if from_value == 'celsius':
             if to_value == 'kelvin':
-                pass
+                result = self.celsius_to_kelvin(float(value))
+            elif to_value == 'fahrenheit':
+                result = self.celsius_to_fahren(float(value))
+        elif from_value == 'fahrenheit':
+            if to_value == 'celsius':
+                result = self.fahren_to_celsius(float(value))
+            elif to_value == 'kelvin':
+                result = self.fahren_to_kelvin(float(value))
+        else:
+            if to_value == 'fahrenheit':
+                result = self.kelvin_to_fahren(float(value))
+            elif to_value == 'celsius':
+                result = self.kelvin_to_celsius(float(value))
 
-        self.result_text.setText('Result: %s' % str(from_value))
+        self.result_text.setText('Result: %s' % str(result))
 
-    def celsius_to_fahren(value: float) -> float:
+    def celsius_to_fahren(self, value: float) -> float:
         return (value * 9/5) + 32
 
-    def celsius_to_kelvin(value: float) -> float:
+    def celsius_to_kelvin(self, value: float) -> float:
         return value + 273.15
 
-    def fahren_to_celsius(value: float) -> float:
+    def fahren_to_celsius(self, value: float) -> float:
         return (value - 32) * 5/9
 
-    def fahren_to_kelvin(value: float) -> float:
-        return (value - 32) * 9/5 + 273.15
+    def fahren_to_kelvin(self, value: float) -> float:
+        return round((value - 32) * 9/5 + 273.15, 2)
 
-    def kelvin_to_celsius(value: float) -> float:
+    def kelvin_to_celsius(self, value: float) -> float:
         return value - 273.15
 
-    def kelvin_to_fahren(value: float) -> float:
+    def kelvin_to_fahren(self, value: float) -> float:
         return (value - 273.15) * 9/5 + 32
 
 
