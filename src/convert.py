@@ -132,38 +132,42 @@ class MainWindow(QMainWindow):
         if from_value == 'celsius':
             if to_value == 'kelvin':
                 result = self.celsius_to_kelvin(float(value))
+                self.result_text.setText(f'Result: {str(result)}K')
             elif to_value == 'fahrenheit':
                 result = self.celsius_to_fahren(float(value))
+                self.result_text.setText(f'Result: {str(result)}°F')
         elif from_value == 'fahrenheit':
             if to_value == 'celsius':
                 result = self.fahren_to_celsius(float(value))
+                self.result_text.setText(f'Result: {str(result)}°C')
             elif to_value == 'kelvin':
                 result = self.fahren_to_kelvin(float(value))
+                self.result_text.setText(f'Result: {str(result)}K')
         else:
             if to_value == 'fahrenheit':
                 result = self.kelvin_to_fahren(float(value))
+                self.result_text.setText(f'Result: {str(result)}°F')
             elif to_value == 'celsius':
                 result = self.kelvin_to_celsius(float(value))
-
-        self.result_text.setText('Result: %s' % str(result))
+                self.result_text.setText(f'Result: {str(result)}°C')
 
     def celsius_to_fahren(self, value: float) -> float:
-        return (value * 9/5) + 32
+        return round((value * 9/5) + 32, 2)
 
     def celsius_to_kelvin(self, value: float) -> float:
-        return value + 273.15
+        return round(value + 273.15, 2)
 
     def fahren_to_celsius(self, value: float) -> float:
-        return (value - 32) * 5/9
+        return round((value - 32) * 5/9, 2)
 
     def fahren_to_kelvin(self, value: float) -> float:
         return round((value - 32) * 9/5 + 273.15, 2)
 
     def kelvin_to_celsius(self, value: float) -> float:
-        return value - 273.15
+        return round(value - 273.15, 2)
 
     def kelvin_to_fahren(self, value: float) -> float:
-        return (value - 273.15) * 9/5 + 32
+        return round((value - 273.15) * 9/5 + 32, 2)
 
 
 app = QApplication([])
